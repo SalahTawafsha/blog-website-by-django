@@ -1,0 +1,193 @@
+html, body {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    background-color: lightgrey;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    display: table;
+    margin: auto;
+}
+
+
+body {
+    display: flex;
+    flex-direction: column;
+
+}
+
+p strong {
+    color: red;
+}
+
+main {
+    text-align: center;
+}
+
+header {
+    margin: 0;
+    width: 100%;
+    height: 50px;
+    border: 1px solid;
+    background: linear-gradient(to bottom left, wheat, azure);
+    font-family: Calibri, serif;
+}
+
+.horizontal-items {
+    height: 100%;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.horizontal-items * {
+    margin: auto;
+}
+
+.horizontal-items a {
+    color: gray;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.5s;
+}
+
+.horizontal-items a:hover {
+    color: black;
+}
+
+
+.comment {
+    justify-content: space-around;
+    background-color: azure;
+    width: 200px;
+    overflow: auto;
+    margin: 0 auto;
+    padding: 5px;
+    border-radius: 100px;
+}
+
+.comment *{
+    margin: 0;
+}
+
+.comment pre{
+    margin: 0 10px;
+}
+
+img {
+    width: 50px;
+}
+
+h1 {
+    text-align: center;
+}
+
+hr {
+    min-width: 500px;
+}
+
+.post {
+    width: 500px;
+    align-self: center;
+    margin: 10px auto;
+    padding: 1px 0;
+    background-color: azure;
+    border-radius: 20px;
+}
+
+.post a {
+    color: gray;
+    font-family: "Comic Sans MS", sans-serif;
+    text-decoration: none;
+    transition: 0.5s;
+}
+
+.post a:hover {
+    color: #343434;
+}
+
+div h5 {
+    margin-left: 5px;
+    font-family: sans-serif;
+}
+
+p {
+    white-space: pre-line;
+    line-break: anywhere;
+}
+
+pre {
+    margin: auto;
+    max-width: 500px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    text-align: left;
+}
+
+.create-post-button {
+    color: brown;
+    font-size: 20px;
+    font-family: cursive;
+    text-decoration: none;
+    transition: 0.5s;
+    padding: 0 10px;
+    border-radius: 10px;
+}
+
+.create-post-button:hover {
+    color: #343434;
+    background-color: brown;
+}
+
+.current-page-number {
+    font-size: 16px;
+    font-family: cursive;
+
+}
+
+.pagination a {
+    padding: 5px 10px;
+    font-size: 16px;
+    font-family: cursive;
+    text-decoration: none;
+    transition: 0.5s;
+    border-radius: 10px;
+    background-color: wheat;
+    color: darkgray;
+}
+
+.pagination a:hover {
+    background-color: darkgreen;
+}
+
+fieldset {
+    max-width: 500px;
+    margin: auto;
+}
+
+footer {
+    height: 50px;
+    margin-top: auto;
+    background: linear-gradient(to top right, wheat, azure);
+    text-align: center;
+    font-family: cursive;
+    font-size: 14px;
+    color: darkgray;
+}
+
+.contact {
+    color: darkgray;
+    transition: 0.5s;
+    text-decoration: none;
+}
+
+.contact:hover {
+    color: #343434;
+}

@@ -1,0 +1,35 @@
+{% extends "posts/base_site.html" %}
+{% block title %}Recently posts{% endblock %}
+{% block header_title %}Recently posts{% endblock %}
+{% block main %}
+    {% if page_obj %}
+        {% for post in page_obj %}
+            <div class="post">
+                <a href="/posts/{{ post.slug }}/"><h2>{{ post.title }}</h2></a>
+                <h5>By: {{ post.author }}, on {{ post.publish }}</h5>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h2>No any posts in Blog yet</h2>
+    {% endif %}
+
+    <br>
+    <a class="create-post-button" href="/posts/new-post/">Create New post?</a>
+
+    <br><br>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current-page-number">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+        {% endif %}
+    </div>
+
+{% endblock %}
+

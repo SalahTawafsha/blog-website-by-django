@@ -1,0 +1,29 @@
+{% extends "posts/base_site.html" %}
+{% block title %}Add New Post{% endblock %}
+{% block header_title %}Add New Post{% endblock %}
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'posts/style.css' %}">
+
+{% block main %}
+    <form action="{% url 'create' %}" method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Create New Post</legend>
+            <label for="title">Post Title:&nbsp&nbsp&nbsp</label>
+            <input type="text" name="title" id="title" required>
+            <br><br>
+
+            <label for="author">Post Author:</label>
+            <input type="text" name="author" id="author" required>
+            <br><br>
+
+            <label for="body">Post Body:&nbsp&nbsp</label>
+            <textarea name="body" id="body" cols="30" rows="10" required></textarea>
+            <br><br>
+
+            <input type="submit" value="Create">
+        </fieldset>
+    </form>
+
+{% endblock %}
