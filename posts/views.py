@@ -1,19 +1,31 @@
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseRedirect
+from django import forms
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
-from django.template import loader
 from django.urls import reverse
-from django.utils import timezone
-import datetime
 
 from .models import Post, Comment
+
+PAGE_SIZE = 3
+
+
+class CreatePostForm(forms.Form):
+    title = forms.CharField(label="Title", max_length=100)
+    author = forms.CharField(label="Author", max_length=30)
+    body = forms.CharField(label="Body", max_length=2000, widget=forms.Textarea)
+
+
+class AddCommentForm(forms.Form):
+    name = forms.CharField(label="Name", max_length=30)
+    email = forms.EmailField(label="Email", max_length=30)
+    body = forms.CharField(label="Body", max_length=2000, widget=forms.Textarea)
 
 
 # Create your views here.
 def index(request):
     # use my manager to get published posts
-    published_posts = Post.objects.published_posts()
-    paginator = Paginator(published_posts, 3)
+    published_posts = Post.published_ojects.all()
+    paginator = Paginator(published_posts, PAGE_SIZE)
 
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -25,33 +37,52 @@ def index(request):
 
 
 def post_details(request, slug):
+    form = AddCommentForm()
     post = get_object_or_404(Post, slug=slug)
-    return render(request, "posts/postDetail.html", {"post": post})
+    return render(request, "posts/postDetail.html", {"post": post, "form": form})
 
 
 def create_post(request):
-    return render(request, "posts/create_post.html", {})
+    if request.method == "POST":
+        form = CreatePostForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            author = form.cleaned_data["author"]
+            body = form.cleaned_data["body"]
 
+            post = Post(title=title, author=author, body=body)
+            post.save()
+            return HttpResponseRedirect(reverse("post_details", args=(post.slug,)))
+    else:
+        form = CreatePostForm()
 
-def create(request):
-    post = Post(title=request.POST["title"], body=request.POST["body"], author=request.POST["author"])
-    post.save()
-    return HttpResponseRedirect(reverse("index"))
+    return render(request, "posts/create_post.html", {'form': form})
 
 
 def comment_action(request):
-    last_comments = Comment.objects.filter(email=request.POST["email"]).order_by("-updated")
-    if last_comments and last_comments[0].updated > timezone.now() - datetime.timedelta(seconds=30):
-        return render(request, "posts/postDetail.html", {
-            "post": Post.objects.get(id=request.POST["post_id"]),
-            "error_message": f"You can't comment twice in 30 seconds.",
-            "expand_comment": True,
-        })
-    else:
-        comment = Comment(post_id=request.POST["post_id"], user_name=request.POST["name"],
-                          body=request.POST["body"], email=request.POST["email"])
+    form = AddCommentForm(request.POST)
+    if form.is_valid():
+        post_id = request.POST["post_id"]
+        name = form.cleaned_data["name"]
+        email = form.cleaned_data["email"]
+        body = form.cleaned_data["body"]
+
+        comment = Comment(post_id=post_id, user_name=name,
+                          body=body, email=email)
+
+        if comment.is_there_comment_in_recent_30_sec():
+            return render(request, "posts/postDetail.html", {
+                "post": Post.published_ojects.get(id=request.POST["post_id"]),
+                "error_message": f"You can't comment twice in 30 seconds.",
+                "expand_comment": True,
+                "form": form,
+            })
+
         comment.save()
         return render(request, "posts/postDetail.html", {
-            "post": Post.objects.get(id=request.POST["post_id"]),
+            "post": Post.published_ojects.get(id=request.POST["post_id"]),
             "expand_comment": True,
+            "form": AddCommentForm(),
         })
+    else:
+        raise Http404("Question does not exist")

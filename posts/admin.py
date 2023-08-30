@@ -14,6 +14,9 @@ class PostAdmin(admin.ModelAdmin):
         self.exclude = ()
         return super().change_view(request, object_id)
 
+    def get_queryset(self, request):
+        return Post.all_objects.all()
+
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ("user_name", "post", "body", "updated", "isActive")
