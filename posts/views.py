@@ -24,7 +24,7 @@ class AddCommentForm(forms.Form):
 # Create your views here.
 def index(request):
     # use my manager to get published posts
-    published_posts = Post.published_ojects.all()
+    published_posts = Post.published_objects.all()
     paginator = Paginator(published_posts, PAGE_SIZE)
 
     page_number = request.GET.get("page")
@@ -72,7 +72,7 @@ def comment_action(request):
 
         if comment.is_there_comment_in_recent_30_sec():
             return render(request, "posts/postDetail.html", {
-                "post": Post.published_ojects.get(id=request.POST["post_id"]),
+                "post": Post.published_objects.get(id=request.POST["post_id"]),
                 "error_message": f"You can't comment twice in 30 seconds.",
                 "expand_comment": True,
                 "form": form,
@@ -80,7 +80,7 @@ def comment_action(request):
 
         comment.save()
         return render(request, "posts/postDetail.html", {
-            "post": Post.published_ojects.get(id=request.POST["post_id"]),
+            "post": Post.published_objects.get(id=request.POST["post_id"]),
             "expand_comment": True,
             "form": AddCommentForm(),
         })

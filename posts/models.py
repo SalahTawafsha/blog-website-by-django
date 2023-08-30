@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from django.db import models
 from django.utils import timezone
@@ -12,9 +13,9 @@ class PublishedPostManager(models.Manager):
         return super().get_queryset().filter(status="P").order_by("-publish")
 
 
-class AllPostManager(models.Manager):
+class DraftManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().order_by("-publish")
+        return super().get_queryset().filter(status="D").order_by("-publish")
 
 
 class Post(models.Model):
@@ -22,8 +23,9 @@ class Post(models.Model):
         ("D", "Draft"),
         ("P", "Published"),
     )
-    published_ojects = PublishedPostManager()
-    all_objects = AllPostManager()
+    objects = models.Manager()
+    published_objects = PublishedPostManager()
+    all_objects = DraftManager()
     title = models.CharField("Post Title", max_length=100)
     slug = models.SlugField(unique=True, blank=False, null=False)
     author = models.CharField("Auther name", max_length=30)
@@ -49,16 +51,8 @@ class Post(models.Model):
         super().save(*args, **kwargs)
 
     def uniquify(self):
-        if Post.all_objects.filter(slug=self.slug).exists():
-            last_char = self.slug[-1]
-            if last_char.isdigit():
-                num = int(last_char)
-                if num == 9:
-                    self.slug = self.slug[:-1] + "10"
-                else:
-                    self.slug = self.slug[:-1] + str(num + 1)
-            else:
-                self.slug += "-1"
+        slug = self.slug
+        self.slug = slug + "-" + random.randint(0, 1000000000)
 
 
 class Comment(models.Model):
