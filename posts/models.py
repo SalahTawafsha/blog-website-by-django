@@ -1,6 +1,7 @@
 import datetime
 import random
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
@@ -28,7 +29,7 @@ class Post(models.Model):
     all_objects = DraftManager()
     title = models.CharField("Post Title", max_length=100)
     slug = models.SlugField(unique=True, blank=False, null=False)
-    author = models.CharField("Auther name", max_length=30)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.TextField("Post body", max_length=2000)
     publish = models.DateTimeField("Data of publish", default=timezone.now)
     created = models.DateTimeField("Data of create", auto_now_add=True)
@@ -52,7 +53,7 @@ class Post(models.Model):
 
     def uniquify(self):
         slug = self.slug
-        self.slug = slug + "-" + random.randint(0, 1000000000)
+        self.slug = slug + "-" + str(random.randint(0, 1000000000))
 
 
 class Comment(models.Model):

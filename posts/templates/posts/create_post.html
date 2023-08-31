@@ -3,7 +3,6 @@
 {% block header_title %}Create New Post{% endblock %}
 
 {% load static %}
-<link rel="stylesheet" href="{% static 'posts/style.css' %}">
 
 {% block main %}
     <form action="{% url 'create_post' %}" method="post">
@@ -11,7 +10,7 @@
         <fieldset class="form-fields">
             <legend>Create New Post</legend>
             {% csrf_token %}
-            {{ form.as_div}}
+            {{ form.as_div }}
             <br>
             <input type="submit" value="Create">
         </fieldset>

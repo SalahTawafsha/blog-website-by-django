@@ -1,0 +1,32 @@
+{% extends "users/base_site.html" %}
+
+{% block header_title %}Login Page{% endblock %}
+{% block title %}Login Page{% endblock %}
+
+{% block main %}
+    <form novalidate method="post">
+        {% csrf_token %}
+        <fieldset class="form-fields">
+            <legend>Create New Post</legend>
+            {% csrf_token %}
+            {% for field in form %}
+                <div>
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {{ field.label_tag }} {{ field }}
+                </div>
+            {% endfor %}
+            <br>
+            <input type="submit" value="Log in">
+
+            <br><br>
+            <a class="sign-up-button" href="/users/add-user/">sign up</a>
+        </fieldset>
+    </form>
+
+{% endblock %}

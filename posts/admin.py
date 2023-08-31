@@ -15,7 +15,7 @@ class PostAdmin(admin.ModelAdmin):
         return super().change_view(request, object_id)
 
     def get_queryset(self, request):
-        return Post.all_objects.all()
+        return Post.objects.all()
 
 
 class CommentAdmin(admin.ModelAdmin):
