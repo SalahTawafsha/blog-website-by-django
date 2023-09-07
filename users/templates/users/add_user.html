@@ -13,7 +13,7 @@
             {% for field in form %}
                 <div>
                     {% if field.errors %}
-                        <ul class="errorlist">
+                        <ul class="error-list">
                             {% for error in field.errors %}
                                 <li>{{ error }}</li>
                             {% endfor %}

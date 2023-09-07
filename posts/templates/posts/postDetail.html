@@ -6,37 +6,55 @@
 <link rel="stylesheet" href="{% static 'posts/style.css' %}">
 
 {% block main %}
-    <h1>{{ post.title }}</h1>
-    <h5>By: {{ post.author }}</h5>
-    <br>
-
-    <pre>{{ post.body }}</pre>
-    <br>
-    <details {% if expand_comment %}open{% endif %}>
-        <summary>Show Comments</summary>
-        <h2>Comments:</h2>
-        {% for comment in post.comment_set.all %}
-            <div class="comment">
-                <strong>{{ comment.user_name }}:</strong>
-                <pre>{{ comment.body }}</pre>
-            </div>
-            <br>
-        {% endfor %}
-
-        {% if error_message %}
-            <p><strong>{{ error_message }}</strong></p>
+    {% if not edit %}
+        <h1>{{ post.title }}</h1>
+        {% if request.user.is_authenticated and post.author == request.user %}
+            <h5><a href="/posts/post-details/{{ post.slug }}?edit=1">edit</a></h5>
+        {% else %}
+            <h5>By: {{ post.author }}</h5>
         {% endif %}
-        <form action="{% url 'comment_action' %}" method="post">
-            {% csrf_token %}
-            <fieldset class="form-fields">
-                <legend>Add Comment</legend>
-                <input type="hidden" name="post_id" value="{{ post.id }}" required>
+        <br>
 
-                {{ form.as_div }}
+        <pre>{{ post.body }}</pre>
+        <br>
+        <details {% if expand_comment %}open{% endif %}>
+            <summary>Show Comments</summary>
+            <h2>Comments:</h2>
+            {% for comment in post.comment_set.all %}
+                <div class="comment">
+                    <strong>{{ comment.user_name }}:</strong>
+                    <pre>{{ comment.body }}</pre>
+                </div>
+                <br>
+            {% endfor %}
 
-                <input type="submit" value="Create">
-            </fieldset>
-        </form>
-    </details>
+            {% if error_message %}
+                <p><strong>{{ error_message }}</strong></p>
+            {% endif %}
+            <form action="{% url 'comment_action' %}" method="post">
+                {% csrf_token %}
+                <fieldset class="form-fields">
+                    <legend>Add Comment</legend>
+                    <input type="hidden" name="post_id" value="{{ post.id }}" required>
+
+                    {{ form.as_div }}
+
+                    <input type="submit" value="Create">
+                </fieldset>
+            </form>
+        </details>
+    {% else %}
+        <form action="/posts/post-details/{{ post.slug }}/" method="post">
+                {% csrf_token %}
+                <fieldset class="form-fields">
+                    <legend>Edit Post</legend>
+                    <input type="hidden" name="post_id" value="{{ post.id }}" required>
+
+                    {{ form.as_div }}
+
+                    <input type="submit" value="Save">
+                </fieldset>
+            </form>
+    {% endif %}
 
 {% endblock %}

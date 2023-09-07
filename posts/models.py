@@ -67,7 +67,7 @@ class Comment(models.Model):
 
     def is_there_comment_in_recent_30_sec(self):
         try:
-            Comment.objects.get(email=self.email, updated__gte=timezone.now() - datetime.timedelta(seconds=30))
+            Comment.objects.get(email=self.email, created__gte=timezone.now() - datetime.timedelta(seconds=30))
             return True
         except Comment.DoesNotExist:
             return False

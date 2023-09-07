@@ -12,7 +12,7 @@
             {% for field in form %}
                 <div>
                     {% if field.errors %}
-                        <ul class="errorlist">
+                        <ul class="error-list">
                             {% for error in field.errors %}
                                 <li>{{ error }}</li>
                             {% endfor %}
@@ -22,10 +22,13 @@
                 </div>
             {% endfor %}
             <br>
-            <input type="submit" value="Log in">
+            <input class="log-in-button" type="submit" value="Log in">
 
             <br><br>
-            <a class="sign-up-button" href="/users/add-user/">sign up</a>
+            <span>Don't have account? </span>
+            <a href="/users/add-user/">sign up</a>
+            <br><br>
+            <a class="log-in-button" href="/posts/">Continue without log in</a>
         </fieldset>
     </form>
 

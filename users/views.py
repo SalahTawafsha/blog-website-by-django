@@ -36,7 +36,9 @@ def user_register(request):
 
 
 def user_log_in(request):
-    logout(request)
+    if request.user.is_authenticated:
+        return redirect("posts")
+
     if request.method == "GET":
         form = LoginForm()
         return render(request, "users/log_in.html", {"form": form})
@@ -51,3 +53,8 @@ def user_log_in(request):
             return redirect("posts")
 
     return render(request, "users/log_in.html", {"form": form})
+
+
+def log_out(request):
+    logout(request)
+    return redirect("index")

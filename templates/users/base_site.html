@@ -13,11 +13,7 @@
     <ul class="horizontal-items">
         <li><a href="/posts/">Main Menu</a></li>
         <li><h3>{% block header_title %}{% endblock %}</h3></li>
-        {% if request.user.is_authenticated %}
-            <li><a href="/users/log-out">log out</a></li>
-        {% else %}
-            <li><a href="/">Log in</a></li>
-        {% endif %}
+
     </ul>
 </header>
 

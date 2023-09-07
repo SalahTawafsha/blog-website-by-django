@@ -9,7 +9,7 @@ from .models import Post, Comment
 PAGE_SIZE = 3
 
 
-class AddPostForm(forms.Form):
+class PostForm(forms.Form):
     title = forms.CharField(label="Title", max_length=100)
     body = forms.CharField(label="Body", max_length=2000, widget=forms.Textarea)
 
@@ -45,7 +45,24 @@ def index(request):
 
 
 def post_details(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            body = form.cleaned_data["body"]
+
+            post.title = title
+            post.body = body
+            post.save()
+
     if request.user.is_authenticated:
+        if request.GET.get("edit") and post.author == request.user:
+            form = PostForm(initial={"title": post.title, "body": post.body})
+
+            return render(request, "posts/postDetail.html", {"post": post, 'form': form, "edit": True})
+
         user = request.user
         form = AddCommentForm(initial={"name": user.username, "email": user.email})
         form.fields["name"].widget = forms.HiddenInput()
@@ -53,7 +70,6 @@ def post_details(request, slug):
     else:
         form = AddCommentForm()
 
-    post = get_object_or_404(Post, slug=slug)
     return render(request, "posts/postDetail.html", {"post": post, "form": form})
 
 
@@ -67,13 +83,9 @@ def add_comment(request):
             form = AddCommentForm(request.POST)
 
         if form.is_valid():
-            post_id = request.POST["post_id"]
-            name = form.cleaned_data["name"]
-            email = form.cleaned_data["email"]
-            body = form.cleaned_data["body"]
 
-            comment = Comment(post_id=post_id, user_name=name,
-                              body=body, email=email)
+            comment = Comment(post_id=request.POST["post_id"], user_name=form.cleaned_data["name"],
+                              email=form.cleaned_data["email"], body=form.cleaned_data["body"])
 
             if comment.is_there_comment_in_recent_30_sec():
                 return render(request, "posts/postDetail.html", {
@@ -118,7 +130,7 @@ def add_comment(request):
 def add_post(request):
     if request.user.is_authenticated:
         if request.method == "POST":
-            form = AddPostForm(request.POST)
+            form = PostForm(request.POST)
             if form.is_valid():
                 title = form.cleaned_data["title"]
                 author = request.user
@@ -130,6 +142,6 @@ def add_post(request):
             else:
                 return render(request, "posts/create_post.html", {'form': form})
 
-        return render(request, "posts/create_post.html", {'form': AddPostForm()})
+        return render(request, "posts/create_post.html", {'form': PostForm()})
     else:
         return redirect("index")

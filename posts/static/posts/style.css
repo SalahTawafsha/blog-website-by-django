@@ -151,7 +151,7 @@ pre {
 
 }
 
-.pagination a, .sign-up-button {
+.pagination a, .log-in-button {
     padding: 5px 10px;
     font-size: 16px;
     font-family: cursive;
@@ -162,7 +162,7 @@ pre {
     color: darkgray;
 }
 
-.pagination a:hover, .sign-up-button:hover {
+.pagination a:hover, .log-in-button:hover {
     background-color: darkgreen;
 }
 
@@ -199,7 +199,7 @@ label {
     margin: 10px 0;
 }
 
-.errorlist {
+.error-list {
     list-style: none;
     margin: 0 0 4px;
     padding: 0;
