@@ -2,20 +2,74 @@
 {% block title %}Post Details{% endblock %}
 {% block header_title %}Post Details{% endblock %}
 
-{% load static %}
-<link rel="stylesheet" href="{% static 'posts/style.css' %}">
-
 {% block main %}
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == "warning" %}
+                <p>
+                    <strong style="color: orange">{{ message }}</strong>
+                </p>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     {% if not edit %}
+        {% if current_viewing_number %}
+            <p>This is {{ current_viewing_number }} post read today and you have {{ remaining_viewing_number }}
+                remain</p>
+        {% endif %}
+
         <h1>{{ post.title }}</h1>
         {% if request.user.is_authenticated and post.author == request.user %}
-            <h5><a href="/posts/post-details/{{ post.slug }}?edit=1">edit</a></h5>
+            <button onclick="location.href='/posts/post-details/{{ post.slug }}?edit=1'">Edit Post</button>
+        {% elif request.user.is_authenticated %}
+            <h5 style="display: inline">By: {{ post.author }} </h5>
+            <form id="subscribe-form" method="POST" action="{% url 'subscribe' %}" style="display: inline">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ post.author.id }}">
+                <input type="hidden" name="post_slug" value="{{ post.slug }}">
+                <button onclick="submitForm('subscribe-form')">
+                    subscribe
+                </button>
+                <br>
+                <pre style="text-align: center">{{ post.author.subscribed_users.count }} Subscriber</pre>
+                <br>
+            </form>
+
         {% else %}
             <h5>By: {{ post.author }}</h5>
+            <pre style="text-align: center">{{ post.author.subscribed_users.count }} Subscriber</pre>
+            <br>
         {% endif %}
-        <br>
+        <button onclick="location.href='/posts/post-details/{{ post.slug }}?edit=1&summary=1'">Summarize Post</button>
+        <button onclick="location.href='/posts/post-details/{{ post.slug }}?edit=1&grammar=1'">Fix Grammars in Post
+        </button>
+        <br><br>
 
-        <pre>{{ post.body }}</pre>
+        <pre id="post_body">{{ post.body }}</pre>
+
+        {% if request.user.is_authenticated %}
+            <form id="like-form" method="POST" action="{% url 'like_post' %}" style="display: inline">
+                {% csrf_token %}
+                <input type="hidden" name="post_id" value="{{ post.id }}">
+                <i onclick="submitForm('like-form')" id="like" class="fa fa-thumbs-up"
+                   style="font-size: 20px;margin: 10px 5px">
+                    Like</i>
+                <span style="display: inline">{{ post.users_liked.count }}</span>
+            </form>
+
+            <form id="dislike-form" method="POST" action="{% url 'dislike_post' %}" style="display: inline">
+                {% csrf_token %}
+                <input type="hidden" name="post_id" value="{{ post.id }}">
+                <i onclick="submitForm('dislike-form')" id="dislike" class="fa fa-thumbs-down"
+                   style="font-size: 20px;margin: 10px 5px"> Dislike</i>
+                <span style="display: inline">{{ post.users_disliked.count }}</span>
+            </form>
+            <script>
+                function submitForm(formId) {
+                    document.getElementById(formId).submit();
+                }
+            </script>
+        {% endif %}
         <br>
         <details {% if expand_comment %}open{% endif %}>
             <summary>Show Comments</summary>
@@ -28,9 +82,13 @@
                 <br>
             {% endfor %}
 
-            {% if error_message %}
-                <p><strong>{{ error_message }}</strong></p>
-            {% endif %}
+            {% for message in messages %}
+                {% if message.tags == "error" %}
+                    <p>
+                        <strong>{{ message }}</strong>
+                    </p>
+                {% endif %}
+            {% endfor %}
             <form action="{% url 'comment_action' %}" method="post">
                 {% csrf_token %}
                 <fieldset class="form-fields">
@@ -45,16 +103,16 @@
         </details>
     {% else %}
         <form action="/posts/post-details/{{ post.slug }}/" method="post">
-                {% csrf_token %}
-                <fieldset class="form-fields">
-                    <legend>Edit Post</legend>
-                    <input type="hidden" name="post_id" value="{{ post.id }}" required>
+            {% csrf_token %}
+            <fieldset class="form-fields">
+                <legend>Edit Post</legend>
+                <input type="hidden" name="post_id" value="{{ post.id }}" required>
 
-                    {{ form.as_div }}
+                {{ form.as_div }}
 
-                    <input type="submit" value="Save">
-                </fieldset>
-            </form>
+                <input type="submit" value="Save">
+            </fieldset>
+        </form>
     {% endif %}
 
 {% endblock %}

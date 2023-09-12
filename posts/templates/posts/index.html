@@ -1,7 +1,39 @@
 {% extends "posts/base_site.html" %}
 {% block title %}Recently posts{% endblock %}
 {% block header_title %}Recently posts{% endblock %}
+
+{% if subscriptions_posts %}
+    {% block aside %}
+        <aside>
+            <ul class="recent-posts">
+                <h3>Subscriptions recent posts:</h3>
+                {% for name, posts in subscriptions_posts.items %}
+                    {% if posts %}
+                        <li>
+                            <h4 style="margin: 5px 0">{{ name }}</h4>
+                            <ul>
+                                {% for post in posts %}
+                                    <li><a href="/posts/post-details/{{ post.slug }}">{{ post.title }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </aside>
+    {% endblock %}
+
+{% endif %}
+
 {% block main %}
+    {% if messages %}
+        <p>
+            {% for message in messages %}
+                <strong>{{ message }}</strong>
+            {% endfor %}
+        </p>
+    {% endif %}
+
     {% if page_obj %}
         {% for post in page_obj %}
             <div class="post">

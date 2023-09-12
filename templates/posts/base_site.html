@@ -3,9 +3,11 @@
 <html lang="en">
 <head>
     <link rel="stylesheet" type="text/css" href="{% static 'posts/style.css' %}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=0.75">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
@@ -20,7 +22,9 @@
         {% endif %}
     </ul>
 </header>
+{% block aside %}
 
+{% endblock %}
 <main>
     {% block main %}
 

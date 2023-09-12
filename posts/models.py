@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.utils.text import slugify
 from better_profanity import profanity
 
+ALLOWED_NUM_OF_CENSORED_WORDS = 3
+
 
 # Create your models here.
 class PublishedPostManager(models.Manager):
@@ -30,7 +32,7 @@ class Post(models.Model):
     title = models.CharField("Post Title", max_length=100)
     slug = models.SlugField(unique=True, blank=False, null=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    body = models.TextField("Post body", max_length=2000)
+    body = models.TextField("Post body", max_length=5000)
     publish = models.DateTimeField("Data of publish", default=timezone.now)
     created = models.DateTimeField("Data of create", auto_now_add=True)
     updated = models.DateTimeField("Data of last update", auto_now=True)
@@ -49,7 +51,16 @@ class Post(models.Model):
 
         self.body = profanity.censor(self.body)
 
+        censored_words_count = self.body.count('****')
+
+        if censored_words_count > ALLOWED_NUM_OF_CENSORED_WORDS:
+            self.author.usertracking.increment_warnings()
+            self.author.usertracking.save()
+            super().save(*args, **kwargs)
+            return True
+
         super().save(*args, **kwargs)
+        return False
 
     def uniquify(self):
         slug = self.slug
@@ -77,7 +88,21 @@ class Comment(models.Model):
             raise Exception("You can't comment twice in 30 seconds.")
 
         self.body = profanity.censor(self.body)
+
+        censored_words_count = self.body.count('****')
+
+        if censored_words_count > ALLOWED_NUM_OF_CENSORED_WORDS:
+            try:
+                user = User.objects.get(username=self.user_name)
+                user.usertracking.increment_warnings()
+                user.usertracking.save()
+                user.save(*args, **kwargs)
+                return True
+            except User.DoesNotExist:
+                pass
+
         super().save(*args, **kwargs)
+        return False
 
     def __str__(self):
         return self.body

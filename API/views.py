@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User, AnonymousUser
 from django.db import IntegrityError
+from django.db.models import Q
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -18,14 +19,32 @@ class UserViewSet(viewsets.ModelViewSet):
     # that just allow GET, POST, PUT and DELETE methods
     permission_classes = [UserPermission]
 
+    def create(self, request, *args, **kwargs):
+        if not request.POST.get("username", False) or not request.POST.get("email", False) \
+                or not request.POST.get("password", False):
+            return Response(data={"message": "you must provide username, email and password"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        User.objects.create(username=request.POST["username"], email=request.POST["email"],
+                            password=request.POST["password"])
+
+        return Response(data={"message": "User added successfully!"}, status=status.HTTP_200_OK)
+
 
 class PostViewSet(viewsets.ModelViewSet):
     """API endpoint that allows Posts to be viewed or edited."""
-    queryset = Post.objects.all().order_by('-created')
+    queryset = Post.objects.all().filter(status="P").order_by('-created')
     serializer_class = PostSerializer
-    # AnonymousPostPermission is allowing just GET and POST
+    # AnonymousPostPermission is allowing just GET
     # and AuthenticatedPostPermission is allowing all others for authenticated users
     permission_classes = (AnonymousPostPermission | AuthenticatedPostPermission,)
+
+    def get_queryset(self, *args, **kwargs):
+        if not isinstance(self.request.user, AnonymousUser):
+            user = self.request.user
+            return Post.objects.all().filter(Q(status="P") | Q(author=user)).order_by('-created')
+
+        return self.queryset
 
     def create(self, request, *args, **kwargs):
         if not request.POST.get("title", False) or not request.POST.get("body", False):
@@ -33,9 +52,9 @@ class PostViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = Token.objects.get(key=request.auth.key).user
-        post = Post(title=request.POST["title"], author=user, body=request.POST["body"])
-        post.save()
-        return Response(data={"message": "Added Success!"}, status=status.HTTP_200_OK)
+        Post.objects.create(title=request.POST["title"], author=user, body=request.POST["body"])
+
+        return Response(data={"message": f"{request.POST['title']} added successfully!"}, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         if not request.POST.get("title", False) or not request.POST.get("body", False):
@@ -52,7 +71,7 @@ class PostViewSet(viewsets.ModelViewSet):
             return Response(data={"message": "Updated !!"}, status=status.HTTP_200_OK)
         else:
             return Response(data={"message": "You are NOT the author of this post !!"},
-                            status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_401_UNAUTHORIZED)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -69,9 +88,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """API endpoint that allows Comments to be viewed or edited."""
-    queryset = Comment.objects.all().order_by('-created')
+    queryset = Comment.objects.all().filter(isActive=True).order_by('-created')
     serializer_class = CommentSerializer
-    # CommentPermission is just allowing GET, POST and DELETE methods for all users
+    # CommentPermission is just allowing GET and POST methods for all users
     permission_classes = (CommentPermission,)
 
     def create(self, request, *args, **kwargs):
@@ -85,7 +104,7 @@ class CommentViewSet(viewsets.ModelViewSet):
                 comment = Comment(post_id=request.POST["post_id"], user_name=user.username,
                                   email=user.email, body=request.POST["body"])
                 comment.save()
-                return Response(data={"message": "Added Success!"}, status=status.HTTP_200_OK)
+                return Response(data={"message": f"{request.POST['body']} added Success!"}, status=status.HTTP_200_OK)
             except IntegrityError:
                 return Response(data={"message": "Post NOT exist!"}, status=status.HTTP_404_NOT_FOUND)
 

@@ -9,8 +9,108 @@
         {% csrf_token %}
         <fieldset class="form-fields">
             <legend>Create New Post</legend>
-            {% csrf_token %}
+            {% for message in messages %}
+                <p>
+                    <strong>{{ message }}</strong>
+                </p>
+            {% endfor %}
+
+            <script>
+
+                function summarizePost() {
+                    const body = document.getElementById('id_body').value;
+                    const apiUrl = '/GPT/summarize-post/';
+
+                    document.getElementById('id_body').value = "please wait"
+
+                    // Get the CSRF token from your Django template
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                    fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({body: body}),
+                    })
+                        .then(response => {
+                            return response.text(); // Treat the response as plain text.
+                        })
+                        .then(data => {
+                            document.getElementById('id_body').value = data
+                        })
+                        .catch(error => {
+                            console.error('Fetch Error:', error);
+                        });
+                }
+
+                function fixGrammarPost() {
+                    const body = document.getElementById('id_body').value;
+                    const apiUrl = '/GPT/fix-post-grammar/';
+
+                    document.getElementById('id_body').value = "please wait"
+
+                    // Get the CSRF token from your Django template
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                    fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({body: body}),
+                    })
+                        .then(response => {
+                            return response.text(); // Treat the response as plain text.
+                        })
+                        .then(data => {
+                            document.getElementById('id_body').value = data
+                        })
+                        .catch(error => {
+                            console.error('Fetch Error:', error);
+                        });
+                }
+
+
+                function generatePost() {
+                    const title = document.getElementById('id_title').value;
+                    const apiUrl = "/GPT/create-post/";
+
+                    document.getElementById('id_body').value = 'please wait';
+
+                    // Get the CSRF token from your Django template
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                    fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({title: title}),
+                    })
+                        .then(response => {
+                            return response.text(); // Treat the response as plain text.
+                        })
+                        .then(data => {
+                            document.getElementById('id_body').value = data
+                        })
+                        .catch(error => {
+                            console.error('Fetch Error:', error);
+                        });
+                }
+            </script>
+            <button type="button" onclick="generatePost()">Generate By GPT</button>
+
             {{ form.as_div }}
+
+            <button type="button" onclick="summarizePost()">Summarize post</button>
+            <button type="button" onclick="fixGrammarPost()">Fix Grammar</button>
             <br>
             <input type="submit" value="Create">
         </fieldset>

@@ -3,7 +3,11 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.urls import reverse
+
+from posts.models import Post
 
 
 class LoginForm(forms.Form):
@@ -58,3 +62,21 @@ def user_log_in(request):
 def log_out(request):
     logout(request)
     return redirect("index")
+
+
+def like_post(request):
+    post = Post.objects.get(pk=request.POST["post_id"])
+    request.user.usertracking.like_post(post)
+    return HttpResponseRedirect(reverse("post_details", args=(post.slug,)))
+
+
+def dislike_post(request):
+    post = Post.objects.get(pk=request.POST["post_id"])
+    request.user.usertracking.dislike_post(post)
+    return HttpResponseRedirect(reverse("post_details", args=(post.slug,)))
+
+
+def subscribe(request):
+    user = User.objects.get(pk=request.POST["user_id"])
+    request.user.usertracking.subscribe(user)
+    return HttpResponseRedirect(reverse("post_details", args=(request.POST["post_slug"],)))

@@ -9,16 +9,31 @@ html, body {
     box-sizing: border-box;
 }
 
+body {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr 5fr;
+
+    grid-template-areas:
+        "header header"
+        "aside main"
+        "footer footer";
+}
+
 html {
     display: table;
     margin: auto;
 }
 
 
-body {
-    display: flex;
-    flex-direction: column;
-
+aside {
+    grid-area: aside;
+    padding-top: 40px;
+    padding-right: 10px;
+    display: inline-block;
+    min-width: 300px;
+    vertical-align: top;
+    background: lightblue;
 }
 
 p strong {
@@ -26,10 +41,16 @@ p strong {
 }
 
 main {
+    grid-area: main;
+    justify-self: left;
+    margin: 10px 0;
     text-align: center;
+    display: inline-block;
+    width: 70%;
 }
 
 header {
+    grid-area: header;
     margin: 0;
     width: 100%;
     height: 50px;
@@ -172,6 +193,8 @@ fieldset {
 }
 
 footer {
+    grid-area: footer;
+
     height: 50px;
     margin-top: auto;
     background: linear-gradient(to top right, lightgrey, azure);
@@ -204,4 +227,24 @@ label {
     margin: 0 0 4px;
     padding: 0;
     color: red;
+}
+
+
+.recent-posts, .recent-posts ul {
+    list-style-type: none;
+}
+
+
+.recent-posts a {
+    color: gray;
+    font-size: 20px;
+    text-decoration: none;
+    transition: 0.5s;
+    padding: 0 10px;
+    border-radius: 10px;
+}
+
+.recent-posts a:hover {
+    color: #343434;
+    background-color: gray;
 }
