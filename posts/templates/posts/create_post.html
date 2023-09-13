@@ -36,10 +36,10 @@
                         body: JSON.stringify({body: body}),
                     })
                         .then(response => {
-                            return response.text(); // Treat the response as plain text.
+                            return response.json(); // Treat the response as plain text.
                         })
                         .then(data => {
-                            document.getElementById('id_body').value = data
+                            document.getElementById('id_body').value = data["response"]
                         })
                         .catch(error => {
                             console.error('Fetch Error:', error);
@@ -65,10 +65,10 @@
                         body: JSON.stringify({body: body}),
                     })
                         .then(response => {
-                            return response.text(); // Treat the response as plain text.
+                            return response.json(); // Treat the response as plain text.
                         })
                         .then(data => {
-                            document.getElementById('id_body').value = data
+                            document.getElementById('id_body').value = data["response"]
                         })
                         .catch(error => {
                             console.error('Fetch Error:', error);
@@ -95,10 +95,10 @@
                         body: JSON.stringify({title: title}),
                     })
                         .then(response => {
-                            return response.text(); // Treat the response as plain text.
+                            return response.json(); // Treat the response as plain text.
                         })
                         .then(data => {
-                            document.getElementById('id_body').value = data
+                            document.getElementById('id_body').value = data["response"]
                         })
                         .catch(error => {
                             console.error('Fetch Error:', error);
