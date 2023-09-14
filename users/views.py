@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from posts.models import Post
+from users.models import CreatePostNotification
 
 
 class LoginForm(forms.Form):
@@ -97,5 +98,17 @@ def subscribe(request):
         user = User.objects.get(pk=request.POST["user_id"])
         request.user.usertracking.subscribe(user)
         return HttpResponseRedirect(reverse("post_details", args=(request.POST["post_slug"],)))
+    except OperationalError:
+        return render(request, "database_error.html")
+
+
+def delete_notification(request, slug):
+    try:
+        if request.user.is_authenticated:
+            post = Post.objects.get(slug=slug)
+            CreatePostNotification.objects.get(post=post, user=request.user).delete()
+            return redirect("index")
+        else:
+            return redirect("index")
     except OperationalError:
         return render(request, "database_error.html")

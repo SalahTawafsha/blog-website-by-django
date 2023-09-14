@@ -15,15 +15,22 @@ MAX_ALLOWED_READ_POSTS_IN_DAY = 3
 MAX_ALLOWED_POST_POSTS_IN_DAY = 3
 
 
+class CreatePostNotification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    message = models.TextField("Text Message", max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 class UserTracking(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     warnings_num = models.SmallIntegerField("Number of Warnings",
                                             default=0)
-    read_posts_num = models.SmallIntegerField("Number of Warnings",
-                                              default=0)
-    day_posts_num = models.SmallIntegerField("Number of created posts in a day",
-                                             default=0)
+    day_read_posts_num = models.SmallIntegerField("Number of Warnings",
+                                                  default=0)
+    day_create_posts_num = models.SmallIntegerField("Number of created posts in a day",
+                                                    default=0)
     date_of_start_block = models.DateTimeField("date of start block", blank=True, null=True,
                                                default=None)
     date_of_end_block = models.DateTimeField("date of end block", blank=True, null=True,
@@ -82,31 +89,35 @@ class UserTracking(models.Model):
 
     def increment_read_posts(self, post):
         if post not in self.read_posts.all():
+            self.day_read_posts_num += 1
+            print(self.day_read_posts_num)
             self.read_posts.add(post)
-            self.read_posts_num += 1
-            if self.read_posts_num == MAX_ALLOWED_READ_POSTS_IN_DAY:
+            if self.day_read_posts_num == MAX_ALLOWED_READ_POSTS_IN_DAY:
                 self.allowed_read_post_date = timezone.now() + datetime.timedelta(days=1)
             self.save()
 
     def is_can_read_post(self):
-        if self.allowed_read_post_date <= timezone.now():
-            self.read_posts_num = 0
-            self.allowed_read_post_date = timezone.now()
-            return True
+        if self.day_read_posts_num == MAX_ALLOWED_READ_POSTS_IN_DAY:
+            if self.allowed_read_post_date <= timezone.now():
+                self.day_read_posts_num = 0
+                self.allowed_read_post_date = timezone.now()
+                return True
+            else:
+                return False
         else:
-            return False
+            return True
 
     def increment_num_of_created_posts(self):
-        self.day_posts_num += 1
+        self.day_create_posts_num += 1
         self.save()
 
     def is_can_post_post(self):
-        if self.day_posts_num == MAX_ALLOWED_POST_POSTS_IN_DAY:
+        if self.day_create_posts_num == MAX_ALLOWED_POST_POSTS_IN_DAY:
             if (self.user.post_set.
                     filter(created__gte=timezone.now() - datetime.timedelta(days=1))):
                 return False
             else:
-                self.day_posts_num = 0
+                self.day_create_posts_num = 0
                 return True
         else:
             return True

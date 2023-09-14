@@ -10,14 +10,8 @@ html, body {
 }
 
 body {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    grid-template-columns: 1fr 5fr;
-
-    grid-template-areas:
-        "header header"
-        "aside main"
-        "footer footer";
+    display: flex;
+    flex-direction: column;
 }
 
 html {
@@ -25,32 +19,18 @@ html {
     margin: auto;
 }
 
-
-aside {
-    grid-area: aside;
-    padding-top: 40px;
-    padding-right: 10px;
-    display: inline-block;
-    min-width: 300px;
-    vertical-align: top;
-    background: lightblue;
-}
-
 p strong {
     color: red;
 }
 
 main {
-    grid-area: main;
     justify-self: left;
-    margin: 10px 0;
+    margin: 20px 0;
     text-align: center;
     display: inline-block;
-    width: 70%;
 }
 
 header {
-    grid-area: header;
     margin: 0;
     width: 100%;
     height: 50px;
@@ -71,7 +51,7 @@ header {
 }
 
 .horizontal-items a {
-    color: gray;
+    color: rgb(128, 128, 128);
     text-decoration: none;
     font-weight: bold;
     transition: 0.5s;
@@ -122,7 +102,7 @@ hr {
 }
 
 .post a {
-    color: gray;
+    color: rgb(128, 128, 128);
     font-family: "Comic Sans MS", sans-serif;
     text-decoration: none;
     transition: 0.5s;
@@ -193,8 +173,6 @@ fieldset {
 }
 
 footer {
-    grid-area: footer;
-
     height: 50px;
     margin-top: auto;
     background: linear-gradient(to top right, lightgrey, azure);
@@ -236,7 +214,7 @@ label {
 
 
 .recent-posts a {
-    color: gray;
+    color: rgb(128, 128, 128);
     font-size: 20px;
     text-decoration: none;
     transition: 0.5s;
@@ -246,5 +224,35 @@ label {
 
 .recent-posts a:hover {
     color: #343434;
-    background-color: gray;
+    background-color: rgb(128, 128, 128);
+}
+
+.notification {
+    background-color: #f2f2f2;
+    border-radius: 20px;
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #ddd;
+    display: inline;
+    max-width: 300px;
+    justify-content: space-between;
+    align-items: center;
+    text-align: -webkit-center;
+    transition: 0.5s;
+    text-decoration: none;
+    color: dodgerblue;
+}
+
+
+.delete-button {
+    background-color: #ff0000;
+    border-radius: 20px;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.notification:hover {
+    background-color: lightslategray;
 }

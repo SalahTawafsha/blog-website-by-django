@@ -2,30 +2,20 @@
 {% block title %}Recently posts{% endblock %}
 {% block header_title %}Recently posts{% endblock %}
 
-{% if subscriptions_posts %}
-    {% block aside %}
-        <aside>
-            <ul class="recent-posts">
-                <h3>Subscriptions recent posts:</h3>
-                {% for name, posts in subscriptions_posts.items %}
-                    {% if posts %}
-                        <li>
-                            <h4 style="margin: 5px 0">{{ name }}</h4>
-                            <ul>
-                                {% for post in posts %}
-                                    <li><a href="/posts/post-details/{{ post.slug }}">{{ post.title }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </aside>
-    {% endblock %}
-
-{% endif %}
 
 {% block main %}
+    {% if notifications %}
+        {% for notification in notifications %}
+            <a class="notification" href="/posts/post-details/{{ notification.post.slug }}">
+                {{ notification.message }}
+            </a>
+            <button class="delete-button"
+                    onclick="window.location.href='/users/delete-notification/{{ notification.post.slug }}/'">Delete
+            </button>
+            <br><br>
+        {% endfor %}
+
+    {% endif %}
     {% if messages %}
         <p>
             {% for message in messages %}

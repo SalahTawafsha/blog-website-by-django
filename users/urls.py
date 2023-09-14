@@ -9,5 +9,6 @@ urlpatterns = [
     path('like_post/', views.like_post, name='like_post'),
     path('dislike_post/', views.dislike_post, name='dislike_post'),
     path('subscribe/', views.subscribe, name='subscribe'),
+    path("users/delete-notification/<slug:slug>/", views.delete_notification, name="delete_notification"),
 
 ]

@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from ChatGPT.GPT import GPT
-from users.models import MAX_ALLOWED_POST_POSTS_IN_DAY, MAX_ALLOWED_READ_POSTS_IN_DAY
+from users.models import MAX_ALLOWED_POST_POSTS_IN_DAY, MAX_ALLOWED_READ_POSTS_IN_DAY, CreatePostNotification
 from .models import Post, Comment, ALLOWED_NUM_OF_CENSORED_WORDS
 
 PAGE_SIZE = 4
@@ -60,21 +60,9 @@ def index(request):
                 messages.error(request, f"You can't read posts since you reach max allowed"
                                         f" posts in day that is {MAX_ALLOWED_READ_POSTS_IN_DAY}")
 
-            subscriptions = request.user.usertracking.subscriptions.all()
-            subscriptions_posts = {}
-            for subscriber in subscriptions:
-                subscriber_posts = subscriber.post_set.all()
+            notifications = CreatePostNotification.objects.filter(user=request.user)
 
-                if subscriber_posts:
-                    unread_posts = []
-                    for subscriber_post in subscriber_posts:
-                        if subscriber_post not in request.user.usertracking.read_posts.all():
-                            unread_posts.append(subscriber_post)
-
-                    if unread_posts:
-                        subscriptions_posts[subscriber.username] = unread_posts
-
-            context["subscriptions_posts"] = subscriptions_posts
+            context["notifications"] = notifications
 
         return render(request, "posts/index.html", context)
     except OperationalError:
@@ -84,7 +72,6 @@ def index(request):
 def post_details(request, slug):
     try:
         post = get_object_or_404(Post, slug=slug)
-
         if request.method == "POST":
             form = PostForm(request.POST)
             if form.is_valid():
@@ -103,6 +90,12 @@ def post_details(request, slug):
 
         if request.user.is_authenticated:
             user = request.user
+            try:
+                notification = CreatePostNotification.objects.get(post=post, user=user)
+                notification.delete()
+            except CreatePostNotification.DoesNotExist:
+                pass
+
             if post.author != user and not user.usertracking.is_can_read_post():
                 return redirect("index")
 
@@ -122,9 +115,10 @@ def post_details(request, slug):
 
         context = {"post": post, "form": form}
         if request.user.is_authenticated and request.user != post.author:
-            context["current_viewing_number"] = ordinal(request.user.usertracking.read_posts_num)
+            context["current_viewing_number"] = ordinal(request.user.usertracking.day_read_posts_num)
             context[
-                "remaining_viewing_number"] = MAX_ALLOWED_READ_POSTS_IN_DAY - request.user.usertracking.read_posts_num
+                "remaining_viewing_number"] = (
+                    MAX_ALLOWED_READ_POSTS_IN_DAY - request.user.usertracking.day_read_posts_num)
 
         return render(request, "posts/postDetail.html", context)
     except OperationalError:
@@ -235,6 +229,11 @@ def add_post(request):
                                          f" {ALLOWED_NUM_OF_CENSORED_WORDS} or more bad words.")
 
                     request.user.usertracking.increment_num_of_created_posts()
+                    for user_tracking in request.user.subscribed_users.all():
+                        (CreatePostNotification.objects.
+                         create(user=user_tracking.user,
+                                post=post,
+                                message=f"{request.user.username} create new post '{post.title}'", ))
                     return HttpResponseRedirect(reverse("post_details", args=(post.slug,)))
                 else:
                     return render(request, "posts/create_post.html", {'form': form})
