@@ -2,25 +2,26 @@ import argparse
 
 from httpx import post, get, delete, put
 
+HOST = "127.0.0.1:8000"
 COMMENTS_END_POINTS = \
     {
-        "GET_COMMENTS": "http://127.0.0.1:8000/API/comments/",
-        "ADD_COMMENT": "http://127.0.0.1:8000/API/comments/",
+        "GET_COMMENTS": "http://" + HOST + "/API/comments/",
+        "ADD_COMMENT": "http://" + HOST + "/API/comments/",
     }
 
 POSTS_END_POINTS = \
     {
-        "GET_COMMENTS": "http://127.0.0.1:8000/API/posts/",
-        "ADD_COMMENT": "http://127.0.0.1:8000/API/posts/",
-        "UPDATE_COMMENT": "http://127.0.0.1:8000/API/posts/{post_id}/",
-        "DELETE_COMMENT": "http://127.0.0.1:8000/API/posts/{post_id}/"
+        "GET_POSTS": "http://" + HOST + "/API/posts/",
+        "ADD_POST": "http://" + HOST + "/API/posts/",
+        "UPDATE_POST": "http://" + HOST + "/API/posts/{post_id}/",
+        "DELETE_POST": "http://" + HOST + "/API/posts/{post_id}/"
     }
 
 USERS_END_POINTS = \
     {
-        "LOG_IN": "http://127.0.0.1:8000/API/api-token-auth/",
-        "SIGN_UP": "http://127.0.0.1:8000/API/users/",
-        "GET_USERS": "http://127.0.0.1:8000/API/users/",
+        "LOG_IN": "http://" + HOST + "/API/api-token-auth/",
+        "SIGN_UP": "http://" + HOST + "/API/users/",
+        "GET_USERS": "http://" + HOST + "/API/users/",
     }
 
 parser = argparse.ArgumentParser()
@@ -97,7 +98,7 @@ if args.get_token:
     response = post(url=USERS_END_POINTS["LOG_IN"],
                     data={"username": args.get_token[0], "password": args.get_token[1]})
 
-    print(response.text)
+    print(response.json())
 
 # py client.py -su <token> <username> <email> <password>
 if args.sign_up:
@@ -117,13 +118,13 @@ if args.list_users:
 
 # py client.py -lp
 if args.list_posts:
-    response = get(url=POSTS_END_POINTS["GET_COMMENTS"])
+    response = get(url=POSTS_END_POINTS["GET_POSTS"])
 
     print(response.text)
 
 # py client.py -ap <token> <title> <body>
 if args.add_post:
-    response = post(url=POSTS_END_POINTS["ADD_COMMENT"],
+    response = post(url=POSTS_END_POINTS["ADD_POST"],
                     headers={"Authorization": "token " + args.add_post[0]},
                     data={"title": args.add_post[1], "body": args.add_post[2]})
 
@@ -131,7 +132,7 @@ if args.add_post:
 
 # py client.py -up <token> <post-id> <new-title> <new-body>
 if args.update_post:
-    response = put(url=POSTS_END_POINTS["UPDATE_COMMENT"].format(post_id=args.update_post[1]),
+    response = put(url=POSTS_END_POINTS["UPDATE_POST"].format(post_id=args.update_post[1]),
                    headers={"Authorization": "token " + args.update_post[0]},
                    data={"title": args.update_post[2], "body": args.update_post[3]})
 
@@ -139,7 +140,7 @@ if args.update_post:
 
 # py client.py -dp <token> <post-id>
 if args.delete_post:
-    response = delete(url=POSTS_END_POINTS["DELETE_COMMENT"].format(post_id=args.delete_post[1]),
+    response = delete(url=POSTS_END_POINTS["DELETE_POST"].format(post_id=args.delete_post[1]),
                       headers={"Authorization": "token " + args.delete_post[0]}, )
 
     print(response.text)

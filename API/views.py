@@ -4,11 +4,16 @@ from django.db.models import Q
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-
+import re
 from .permitions import (UserPermission, AnonymousPostPermission,
                          AuthenticatedPostPermission, CommentPermission)
 from .serializers import UserSerializer, PostSerializer, CommentSerializer
 from posts.models import Post, Comment
+
+
+def is_valid_email(email):
+    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+    return re.fullmatch(regex, email)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -25,8 +30,18 @@ class UserViewSet(viewsets.ModelViewSet):
                     or not request.POST.get("password", False):
                 return Response(data={"message": "you must provide username, email and password"},
                                 status=status.HTTP_400_BAD_REQUEST)
-            User.objects.create(username=request.POST["username"], email=request.POST["email"],
-                                password=request.POST["password"])
+            if not is_valid_email(request.POST["email"]):
+                return Response(data={"message": "email must be as abc@gmail.com!"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if len(request.POST["password"]) < 8:
+                return Response(data={"message": "password must be at least 8 characters!"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                User.objects.create(username=request.POST["username"], email=request.POST["email"],
+                                    password=request.POST["password"])
+            except IntegrityError:
+                return Response(data={"message": "Username already exist!"}, status=status.HTTP_409_CONFLICT)
 
             return Response(data={"message": "User added successfully!"}, status=status.HTTP_200_OK)
         except OperationalError:
