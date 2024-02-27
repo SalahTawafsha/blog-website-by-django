@@ -144,6 +144,7 @@ pre {
 .create-post-button:hover {
     color: #343434;
     background-color: green;
+    cursor: pointer
 }
 
 .current-page-number {
@@ -165,6 +166,7 @@ pre {
 
 .pagination a:hover, .log-in-button:hover {
     background-color: darkgreen;
+    cursor: pointer
 }
 
 fieldset {
@@ -256,3 +258,26 @@ label {
 .notification:hover {
     background-color: lightslategray;
 }
+
+input[type="text"], input[type="password"], input[type="email"], textarea {
+    border-radius: 7px;
+    border: 0;
+    padding: 5px 10px;
+}
+
+input[type="submit"], button {
+    border-radius: 7px;
+    border: 0;
+    padding: 5px 10px;
+}
+
+button:hover, input[type="submit"]:hover {
+    cursor: pointer;
+    background-color: #808080;
+}
+
+i:hover{
+    cursor: pointer;
+}
+
+

@@ -43,6 +43,9 @@ def ordinal(n: int):
 
 # Create your views here.
 def index(request):
+    if not request.user.is_authenticated:
+        return redirect("index")
+
     try:
         # use my manager to get published posts
         published_posts = Post.published_objects.all().order_by("-updated")
@@ -70,6 +73,9 @@ def index(request):
 
 
 def post_details(request, slug):
+    if not request.user.is_authenticated:
+        return redirect("index")
+
     try:
         post = get_object_or_404(Post, slug=slug)
         if request.method == "POST":
@@ -126,6 +132,9 @@ def post_details(request, slug):
 
 
 def add_comment(request):
+    if not request.user.is_authenticated:
+        return redirect("index")
+
     try:
         if request.method == "POST":
 
@@ -195,6 +204,9 @@ def add_comment(request):
 
 
 def add_post(request):
+    if not request.user.is_authenticated:
+        return redirect("index")
+
     try:
         if request.user.is_authenticated:
             if request.method == "POST":

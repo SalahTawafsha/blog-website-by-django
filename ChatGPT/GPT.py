@@ -2,7 +2,7 @@ import openai
 
 
 class GPT:
-    KEY = "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"
+    KEY = "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"
 
     @staticmethod
     def __connect(message):
