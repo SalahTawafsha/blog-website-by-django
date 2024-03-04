@@ -16,7 +16,7 @@ py manage.py migrate
 - User can just post 3 posts per day
 - User can subscribe to other users
 - User receive notification when subscribed user post
-- User can like and comment on posts once in 30 seconds to prevent spamming bots
+- User can comment on posts once in 30 seconds to prevent spamming bots
 - User can use chat gpt-3 to generate post
 - User can use chat gpt-3 to summarize post
 - User can use chat gpt-3 to fix grammar of post
