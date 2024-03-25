@@ -7,7 +7,7 @@
     <form novalidate method="post">
         {% csrf_token %}
         <fieldset class="form-fields">
-            <legend>Create New Post</legend>
+            <legend>Login</legend>
             {% csrf_token %}
             {% for field in form %}
                 <div>
@@ -28,7 +28,6 @@
             <span>Don't have account? </span>
             <a href="/users/add-user/">sign up</a>
             <br><br>
-            <a class="log-in-button" href="/posts/">Continue without log in</a>
         </fieldset>
     </form>
 
