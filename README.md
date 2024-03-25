@@ -45,7 +45,8 @@ py manage.py runserver
 
 ### Create Post
 ![Screenshot 2024-03-25 150227](https://github.com/SalahTawafsha/blog-website-by-Django/assets/93351227/a23f9842-49e8-4bdc-aa00-612132aab4df)
-- we can just enter title for a post then click on generate By GPT 
+- we can just enter title for a post then click on generate By GPT
+
 ![Screenshot 2024-03-25 150448](https://github.com/SalahTawafsha/blog-website-by-Django/assets/93351227/71680843-b2bf-4680-9944-4daed3713ee4)
 - after some seconds the body will filled by post
 - Note that we can summarize the post or fix post grammers by buttons in bottom of form
